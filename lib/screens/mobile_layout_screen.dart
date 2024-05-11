@@ -1,11 +1,49 @@
+import 'package:chat_app/features/auth/controller/auth_controller.dart';
+import 'package:chat_app/features/select_contacts/screens/select_contacts_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../colors.dart';
-import '../widgets/contacts_list.dart';
+import '../features/chat/widgets/contacts_list.dart';
 
 
-class MobileLayoutScreen extends StatelessWidget {
+class MobileLayoutScreen extends ConsumerStatefulWidget  {
   const MobileLayoutScreen({Key? key}) : super(key: key);
+
+  @override
+  ConsumerState<MobileLayoutScreen> createState() => _MobileLayoutScreenState();
+}
+
+class _MobileLayoutScreenState extends ConsumerState<MobileLayoutScreen>
+  with WidgetsBindingObserver{
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+    WidgetsBinding.instance.removeObserver(this);
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    super.didChangeAppLifecycleState(state);
+    switch(state){
+      case AppLifecycleState.resumed:
+        ref.read(authControllerProvider).setUserState(true);
+        break;
+      case AppLifecycleState.inactive:
+      case AppLifecycleState.detached:
+      case AppLifecycleState.paused:
+      case AppLifecycleState.hidden:
+        ref.read(authControllerProvider).setUserState(false);
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,7 +95,9 @@ class MobileLayoutScreen extends StatelessWidget {
         ),
         body: const ContactsList(),
         floatingActionButton: FloatingActionButton(
-          onPressed: () {},
+          onPressed: () {
+            Navigator.pushNamed(context, SelectContactsScreen.routeName);
+          },
           backgroundColor: tabColor,
           child: const Icon(
             Icons.comment,

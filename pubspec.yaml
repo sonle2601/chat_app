@@ -44,6 +44,13 @@ dependencies:
   change_app_package_name: ^1.1.0
   flutter_riverpod: ^2.4.10
   image_picker: ^1.0.8
+  flutter_contacts: ^1.1.7+1
+  uuid: ^4.0.1
+  intl: ^0.19.0
+  cached_network_image: ^3.3.1
+#  video_player: ^2.8.5
+  cached_video_player: ^2.0.4
+  emoji_picker_flutter: ^1.6.4
 
 dev_dependencies:
   flutter_test:

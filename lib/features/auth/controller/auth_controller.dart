@@ -1,18 +1,35 @@
+import 'dart:io';
+
 import 'package:chat_app/features/auth/repository/auth_repository.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../models/user_model.dart';
+
 final authControllerProvider = Provider((ref) {
   final authRepository = ref.watch(authRepositoryProvider);
-  return AuthCotroller(authRepository: authRepository);
+  return AuthCotroller(authRepository: authRepository, ref: ref);
+});
+
+final userDataAuthProvider = FutureProvider((ref)  {
+  final authController = ref.watch(authControllerProvider);
+  return authController.getUserData();
 });
 
 class AuthCotroller {
   final AuthRepository authRepository;
+  final ProviderRef ref;
 
   AuthCotroller({
+    required this.ref,
     required this.authRepository
   });
+
+  Future<UserModel?> getUserData() async{
+    UserModel? user = await authRepository.getCurrentUserData();
+    return user;
+  }
 
   void signInWithPhone(BuildContext context, String phoneNumber){
     authRepository.signInWithPhone(context, phoneNumber);
@@ -25,6 +42,19 @@ class AuthCotroller {
   }
 
   void saveUserDataToFirebase(BuildContext context, String name, File? profilePic){
+    authRepository.saveUserDataToFirebase(
+        name: name,
+        profilePic: profilePic,
+        ref: ref,
+        context: context
+    );
+  }
 
+  Stream<UserModel> userDataById(String userId){
+    return authRepository.userData(userId);
+  }
+
+  void setUserState(bool isOnline) {
+    authRepository.setUserState(isOnline);
   }
 }
